@@ -1,3 +1,14 @@
+"""
+可以做到的事情:
+    输入域名获取whois信息
+    输入IP 以ICMP方式探测存活主机
+
+TODO:
+    增加数据库记录
+    增加生成缓冲区字符功能?
+    分模块,不要把所有函数都挤在一块
+"""
+
 from flask import Flask, render_template, request  # 从 falsk 模块中导入Flask类,render_template
 import requests
 import re
@@ -6,8 +17,8 @@ import threading
 
 lock = threading.Lock()
 active_ips = 0
-active_ip_list =[]
-new_active_ip_list=[]
+active_ip_list = []
+new_active_ip_list = []
 app = Flask(__name__)
 
 """使用jinjia模板渲染"""
@@ -17,9 +28,11 @@ app = Flask(__name__)
 def get_url():
     return render_template('get_url.html')
 
+
 @app.errorhandler(404)
 def page_not_found(error):
     return '来到了没有知识的荒原', 404
+
 
 """從post處接受數據"""
 
@@ -33,7 +46,6 @@ def get_whois():
     whois_text = re.findall(re_expression, res.text)
     whois_text = whois_text[0].split("\n")
     return render_template('url_info.html', whois_texts=whois_text, the_url=url)
-
 
 
 def ping_once(ip):
@@ -54,7 +66,6 @@ def ping_once(ip):
         lock.release()
 
 
-
 def ping(ips):
     global active_ip_list
     global new_active_ip_list
@@ -67,7 +78,8 @@ def ping(ips):
     for t in thrs:
         t.join()
     new_active_ip_list = active_ip_list[::]
-    active_ip_list = [] # 重置列表
+    active_ip_list = []  # 重置列表
+
 
 @app.route('/ping', methods=['POST'])
 def get_ip():
@@ -83,7 +95,6 @@ def get_ip():
             ip = '{0}{1}'.format(new_ip, i)
             ips.append(ip)
         ping(ips)
-
 
         return render_template('live-ip.html', ips=new_active_ip_list)
     except:
