@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <h3>回包了的IP</h3>
+    <table>
+    {% for ip in ips %}
+        <tr>{{ ip }}</tr>
+        <br>
+    {% endfor %}
+    </table>
+{% endblock %}

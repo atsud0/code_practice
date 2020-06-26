@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <table>
+    {% for items in whois_texts %}
+        <tr>{{ items }}</tr>
+        <br>
+    {% endfor %}
+    </table>
+{% endblock %}
