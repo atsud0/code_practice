@@ -11,10 +11,10 @@ TODO:
 ## web-flask的演示
 
 ### 首页
-![](./flask/static/Screenshot_20200626_155913.jpg)
+![](./static/Screenshot_20200626_155913.jpg)
 
 ### whois查询
-![](./flask/static/Screenshot_20200626_160254.jpg)
+![](./static/Screenshot_20200626_160254.jpg)
 
 ### ping功能
-![](./flask/static/Screenshot_20200626_155728.jpg)
+![](./static/Screenshot_20200626_155728.jpg)
