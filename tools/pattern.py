@@ -9,13 +9,13 @@ ALL_CHARS_NUM = 20280
 
 
 def get_pattern_chars():
-    upper_char = 65
-    lower_char = 97
+    Char = 65
+    char = 97
     c = ""
     for i in range(0, 26):
         for j in range(0, 26):
             for k in range(0, 10):
-                c += chr(upper_char + i) + chr(lower_char + j) + "{}".format(k)
+                c += chr(Char + i) + chr(char + j) + "{}".format(k)
 
     return c
 
@@ -33,20 +33,23 @@ def main():
     pattern_char = ""
     try:
         input_num = int(sys.argv[1])
+
         if input_num > ALL_CHARS_NUM:
             count = check_nums(input_num)
             for num in range(0, count + 1):
                 pattern_char += get_pattern_chars()
-            print(pattern_char[0:input_num])
 
         elif 0 < input_num < ALL_CHARS_NUM:
             pattern_char = get_pattern_chars()
-            print(pattern_char[0:input_num])
+
         else:
             print("Usage:Python pattern.py [nums]")
+
+        return pattern_char[0:input_num]
+
     except Exception as error:
         print(error,"\nUsage: python pattern [nums]")
 
 
 if __name__ == '__main__':
-    main()
+    print(main())
