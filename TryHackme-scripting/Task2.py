@@ -28,78 +28,78 @@ General Approach(it's best to do this using the sockets library in Python):
 
 """
 
-
-import socket
-import time
-import re
+import socket, re, time
 
 
-def Main():
-    serverIP = '10.10.117.8'  # Get ip from user input
-    serverPort = 1337
-    oldNum = 0  # Start at 0 as per instruction
+def server_connect(host, port):
+    s = socket.socket()
+    message = 0
+    addr = (host, port)
 
-    while serverPort != 9765:
-        try:  # try until port 1337 available
-            if serverPort == 1337:
-                print(f"Connecting to {serverIP} waiting for port {serverPort} to become available...")
+    s.connect(addr)
 
-            # Create socket and connect to server
-            s = socket.socket()
-            s.connect((serverIP, serverPort))
+    gRequest = f"GET / HTTP/1.1\r\nHost: {host}:{port}\r\n\r\n"
+    s.send(gRequest.encode('UTF-8'))
+    while True:
+        data = s.recv(4096)
+        count = len(data)
+        if count == 0:
+            break
+        message = str(data, encoding='UTF-8')
+    s.close()
 
-            # Send get request to server
-            gRequest = f"GET / HTTP/1.0\r\nHost: {serverIP}:{serverPort}\r\n\r\n"
-            s.send(gRequest.encode('utf8'))
+    return message
 
-            # Retrieve data from get request
-            while True:
-                response = s.recv(1024)
-                if (len(response) < 1):
-                    break
-                data = response.decode("utf8")
 
-            # Format and assign the data into usable variables
-            op, newNum, nextPort = assignData(data)
-            # Perform given calculations
-            oldNum = doMath(op, oldNum, newNum)
-            # Display output and move on
-            print(f"Current number is {oldNum}, moving onto port {nextPort}")
-            serverPort = nextPort
+def get_port(message):
+    message = message.split('\n')
+    ret = message[-1].split(" ")
+    return ret
 
-            s.close()
 
-        except:
-            s.close()
-            time.sleep(3)  # Ports update every 4 sec
+host = '10.10.117.8'
+port = 1337
+num = 0
+num_list = []
+op_list = []
+while 1:
+    try:
+        data = server_connect(host, port)
+        do_list = get_port(data)
+        print(do_list)
+        new_port = int(do_list[2])
+        num_list.append(float(do_list[1]))
+        op_list.append(do_list[0])
+        break
+    except Exception as error:
+        print("等待重置{0},{1}".format(port, error))
+        time.sleep(2)
+        pass
+
+if new_port != 1337:
+    while 1:
+        try:
+            data = server_connect(host, new_port)
+            do_list = get_port(data)
+            new_port = int(do_list[2])
+            num_list.append(float(do_list[1]))
+            op_list.append(do_list[0])
+            print(do_list)
+            if new_port == 9765:
+                break
+        except Exception as error:
+            print("等待重置{0},{1}".format(new_port, error))
+            time.sleep(2)
             pass
 
-    print(f"The final answer is {round(oldNum, 2)}")
+for i in range(len(op_list)):
+    if op_list[i] == 'minus':
+        num -= num_list[i]
+    elif op_list[i] == 'multiply':
+        num *= num_list[i]
+    elif op_list[i] == 'add':
+        num += num_list[i]
+    elif op_list[i] == 'divide':
+        num /= num_list[i]
 
-
-def doMath(op, oldNum, newNum):
-    if op == 'add':
-        return oldNum + newNum
-    elif op == 'minus':
-        return oldNum - newNum
-    elif op == 'divide':
-        return oldNum / newNum
-    elif op == 'multiply':
-        return oldNum * newNum
-    else:
-        return None
-
-
-def assignData(data):
-    dataArr = re.split(' |\*|\n', data)  # Split data with multi delim
-    dataArr = list(filter(None, dataArr))  # Filter null strings
-    # Assign the last 3 values of the data
-    op = dataArr[-3]
-    newNum = float(dataArr[-2])
-    nextPort = int(dataArr[-1])
-
-    return op, newNum, nextPort
-
-
-if __name__ == '__main__':
-    Main()
+print(num)
