@@ -6,3 +6,9 @@
 - flask  输入域名获取whois信息或者输入ip获取该网段的存活主机
 - socket 一个简单的聊天程序
 - request 爬虫小项目
+
+
+
+# 域渗透学习
+
+https://xz.aliyun.com/t/8690
